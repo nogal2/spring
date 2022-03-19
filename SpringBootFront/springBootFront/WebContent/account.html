@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>account</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style type="text/css">
+#app {
+	margin: auto;
+	margin-top: 60px;
+	width: 60%;
+	border: 3px solid #8ac007;
+	padding: 10px;
+}
+p{
+	font-size: 8px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>회원가입</h1>
+<div id="app">
+	<form id="frm">
+		<table border="1">
+			<tr>
+				<td>아이디</td>
+				<td>
+					<input type="text" id="userId" placeholder="아이디입력" size="20">
+					<p id="idCheck"></p>
+					<button type="button" id="idCheckBtn">중복확인</button>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>사용 아이디</td> <!-- 확정된 아이디(실제로 보내는 아이디) -->
+				<td>
+					<input type="text" id="id" name="id" size="20" readonly="readonly">
+				</td>
+			</tr>
+			
+			
+			<tr>
+				<td>패스워드</td>
+				<td>
+					<input type="text" id="pwd" name="pwd" placeholder="비밀번호 입력" size="20">
+				</td>
+			</tr>
+			
+			<tr>
+				<td>이름</td>
+				<td>
+					<input type="text" id="name" name="name" placeholder="이름 입력" size="20">
+				</td>
+			</tr>
+			
+			<tr>
+				<td>이메일</td>
+				<td>
+					<input type="text" id="email" name="email" placeholder="이메일 입력" size="20">
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="2">
+					<button type="button" id="account">회원가입</button>
+				</td>
+			</tr>
+			
+		</table>
+	</form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	// 아이디 중복확인
+	$("#idCheckBtn").click(function() {
+		
+		$.ajax({
+			url:"http://localhost:3000/getId",
+			type:"post",
+			data:{"id":$("#userId").val()},
+			success:function(msg) {
+				//alert('success');
+				//alert(msg);
+				if(msg.trim() == "OK") {
+					$("#idCheck").html("이 아이디는 사용할 수 있습니다.");
+					$("#id").val($("#userId").val())
+				} else {
+					$("#idCheck").html("이 아이디는 사용중입니다.");
+					$("#userId").val("");
+					$("#userid").focus();
+				}
+			}
+		});
+		
+	});
+	
+});
+
+$(document).ready(function() {
+
+	// 회원가입 클릭
+	$("#account").click(function() {
+		//let params = $("#frm").serialize()
+
+		$.ajax({
+			url:"http://localhost:3000/regi",
+			type:"post",
+			//data:params,
+			data:{
+				"id":$("#id").val(), 
+				"pwd":$("#pwd").val(), 
+				"name":$("#name").val(), 
+				"email":$("#email").val()
+				},
+			success:function(msg) {
+				
+				if(msg == "가입되었습니다.") {
+					alert(msg);
+					location.href = "login.html";
+					//$(location).attr('href', "login.html");
+				} {
+					alert(msg);
+				}
+			},
+			error:function(msg) {
+				alert('error');
+			}
+		});
+		
+	});
+});
+
+</script>
+
+</body>
+</html>

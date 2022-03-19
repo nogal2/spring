@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel='stylesheet' href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="container">
+        <table class="table table-striped table-hover">
+            <tr>
+                <th>작성자</th>
+                <td>
+                    <input type="text" id="id" readonly="readonly">
+                </td>
+            </tr>
+            <tr>
+                <th>제목</th>
+                <td>
+                    <input type="text" id="title" size="75px" placeholder="제목 입력">
+                </td>
+            </tr>
+            <tr>
+                <th>내용</th>
+                <td>
+                    <textarea rows="20" cols="80" type="text" id="content" placeholder="내용 입력"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button type="button" id="writeBtn">글쓰기</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+<script type="text/javascript">
+    
+    let json = JSON.parse(sessionStorage.getItem("login"));
+    $("#id").val(json.id);
+	$(document).ready(function() {
+		$("#writeBtn").click(function () {
+			
+            $.ajax({
+                url:"http://localhost:3000/addWrite",
+                type:"post",
+                data: {
+                    id: $("#id").val(),
+                    title: $("#title").val(),
+                    content: $("#content").val()
+                },
+                success: function(msg){
+                    if(msg == "yes") {
+                        alert('작성되었습니다');
+                        location.href = "bbslist.html";
+                    } else {
+                        alert('추가되지 않았습니다.');
+                    }
+                    
+                },
+                error:function() {
+                    alert('error');
+                }
+            });
+			
+		});
+	});
+</script>
+</body>
+</html>

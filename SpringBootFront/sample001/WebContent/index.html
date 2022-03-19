@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<p id="demo"></p>
+
+<table border="1" id="tab">
+</table>
+
+
+<button type="button">클릭</button>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("button").click(function() {
+		//alert('click');
+		/* 
+		$.ajax({	// axios(react,vue)
+			url:"http://localhost:3000/base",
+			type:"get",
+			success:function(data) {
+				//alert("success");
+				$("#demo").text(data)
+			},
+			error:function() {
+				alert("error");
+			}
+		}); */
+		/* 
+		$.ajax({
+			url:"http://localhost:3000/connParamGet",
+			type:"get",
+			data:{title: "제목입니다"},
+			//여기까지는 보낼 때 처리
+			success:function(data) {
+				//alert('success');
+				$("#demo").text(data)
+			},
+			error:function() {
+				alert('error');
+			}
+		});
+		 */
+		 /* 
+		 $.ajax({
+			 url: "http://localhost:3000/getMember",
+			 type:'get',
+			 success:function(json) {
+				 alert(JSON.stringify(json));
+				 $("#demo").append(json.id+"<br>");
+				 $("#demo").append(json.pwd+"<br>");
+				 $("#demo").append(json.name+"<br>");
+				 $("#demo").append(json.email+"<br>");
+			 },
+			 error:function() {
+				 alert('error');
+			 }
+		 })
+		  */
+		$.ajax({
+			url: "http://localhost:3000/getMemberList",
+			type:"get",
+			data: { id:'sbs', pwd:'343', name:'방송국', email:'서울방송@.com', auth:3 },
+			success:function(json) {
+				//alert('success');
+				//alert(JSON.stringify(json));
+				//alert(json.length);
+				
+				let str = "";
+				for(i=0; i < json.length; i++) {
+					str += "<tr>";
+					str += "<td>" + json[i].id + "</td>";
+					str += "<td>" + json[i].pwd + "</td>";
+					str += "<td>" + json[i].name + "</td>";
+					str += "</tr>";
+				}
+				$("#tab").append(str)
+			},
+			error:function() {
+				alert('error');
+			}
+		});
+	});
+});
+
+</script>
+
+</body>
+</html>
