@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Bbs">
+
+<select id="bbslist" parameterType="mul.camp.a.dto.BbsParam" resultType="mul.camp.a.dto.BbsDto">
+	SELECT SEQ, ID, REF, STEP, DEPTH, TITLE, CONTENT, WDATE, DEL, READCOUNT	<!-- * 써도됨 -->
+	FROM BBS
+	<!-- mybatis는 조건문 가능. -->
+	<if test="choice != null and choice != '' and search != null and search != '' ">
+		<if test="choice == 'title'">
+			WHERE TITLE LIKE '%' || #{search} || '%'	<!-- 검색한 검색어가 들어갔을 때 위치에 상관 없이 모든 내용 -->
+			
+		</if>
+		
+		<if test="choice == 'content'">
+			WHERE CONTENT LIKE '%' || #{search} || '%'
+		</if>
+		
+		<if test="choice == 'writer'">
+			WHERE ID=#{search}
+		</if>
+	</if> 
+	ORDER BY REF DESC, STEP ASC
+</select>
+
+<insert id="writebbs" parameterType="mul.camp.a.dto.BbsDto">
+	INSERT INTO BBS(SEQ, ID, REF, STEP, DEPTH, TITLE, CONTENT, WDATE, DEL, READCOUNT)
+	VALUES(SEQ_BBS.NEXTVAL,#{id},(SELECT NVL(MAX(REF)+1, 0) FROM BBS), 0, 0, 	<!-- NVL 앞에있는 값이 값이 NULL이면 뒤에 값으로, 있으면 앞에값으로 -->
+	 									#{title}, #{content}, SYSDATE, 0, 0)	
+</insert>
+
+<select id="detailbbs" parameterType="mul.camp.a.dto.BbsDto" resultType="mul.camp.a.dto.BbsDto">
+	SELECT SEQ, ID, REF, STEP, DEPTH, TITLE, CONTENT, WDATE, DEL, READCOUNT
+	FROM BBS
+	WHERE SEQ = #{seq}
+</select>
+
+<!-- answer -->
+<update id="replyBbsUpdate" parameterType="mul.camp.a.dto.BbsDto">
+	UPDATE BBS
+	SET STEP = STEP+1
+	WHERE REF=(SELECT REF FROM BBS WHERE SEQ=#{seq})
+		AND STEP > (SELECT STEP FROM BBS WHERE SEQ=#{seq})
+<!--UPDATE 부분은 원래 있던 글들을 자리배치하기 위한 설정이다.
+	BBS에서 STEP을 +1 시켜라. 단, BBS테이블의 REF가 seq와 값이 같은 SEQ행 안에 열의 REF값과 같고, 
+	STEP이 seq와 SEQ행 안에 열의 값 STEP 값보다 큰 값들만. 
+	이걸 하는 이유는 원래 썼던 글들이 최신글보다 아래에 있어야 하기 때문이다. STEP은 수치가 높아질수록 아래에 배치되어있도록 설정을 해놓았다.
+-->		
+</update>
+
+<insert id="replyBbsInsert" parameterType="mul.camp.a.dto.BbsDto">
+	INSERT INTO BBS(SEQ, ID, REF, STEP, DEPTH, 
+					TITLE, CONTENT, WDATE, DEL, READCOUNT)
+	VALUES(SEQ_BBS.NEXTVAL, #{id}, 
+			(SELECT REF FROM BBS WHERE SEQ=#{seq}), 	<!-- REF --> 
+			(SELECT STEP FROM BBS WHERE SEQ=#{seq}) +1, <!-- STEP -->
+			(SELECT DEPTH FROM BBS WHERE SEQ=#{seq}) +1,<!-- DEPTH -->
+			#{title}, #{content}, SYSDATE, 0, 0)
+<!--INSERT는 작성한 답글을 자리배치하기 위한 설정이다.
+	REF는 그룹 값이기 때문에 수치를 변경해줄 필요가 없다.
+	STEP은 원래 답글 달려던 값보다 하나 아래 있기 때문에 +1 해주면 된다.
+	DEPTH는 원래 답글 달려던 값보다 하나 옆에 있어야 하기 때문에 +1 해주면된다. 
+-->
+</insert>
+
+<!-- update -->
+<select id="rdupdate" parameterType="Integer" resultType="mul.camp.a.dto.BbsDto">
+	SELECT SEQ, ID, REF, STEP, DEPTH, TITLE, CONTENT, WDATE, DEL, READCOUNT
+	FROM BBS
+	WHERE SEQ=#{seq}
+</select>
+
+<update id="bbsupdate" parameterType="mul.camp.a.dto.BbsDto">
+	UPDATE BBS
+	SET TITLE=#{title}, CONTENT=#{content}
+	WHERE SEQ=#{seq}
+</update>
+
+<!-- delete -->
+<delete id="bbsdelete" parameterType="mul.camp.a.dto.BbsDto">
+	DELETE 
+	FROM BBS
+	WHERE SEQ=#{seq}
+</delete>
+
+</mapper>
+
+
+
+
+
+
